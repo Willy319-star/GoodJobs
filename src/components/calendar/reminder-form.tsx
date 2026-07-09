@@ -25,19 +25,19 @@ export function ReminderForm({ applications, track }: { applications: Applicatio
   const selectedApplication = applications.find((application) => application.id === applicationId);
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form action={formAction} className="flex flex-col gap-6 text-base">
       <input type="hidden" name="track" value={track} />
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="title">提醒内容</FieldLabel>
-          <Input id="title" name="title" placeholder="例如：腾讯一面 / 字节笔试 / 简历投递截止" required />
-          <FieldDescription>写一句你未来要处理的事情。</FieldDescription>
+          <FieldLabel htmlFor="title" className="text-base">提醒内容</FieldLabel>
+          <Input id="title" name="title" className="h-10 text-base" placeholder="例如：腾讯一面 / 字节笔试 / 简历投递截止" required />
+          <FieldDescription className="text-sm">写一句你未来要处理的事情。</FieldDescription>
         </Field>
         <div className="grid gap-4 md:grid-cols-2">
           <Field>
-            <FieldLabel>提醒类型</FieldLabel>
+            <FieldLabel className="text-base">提醒类型</FieldLabel>
             <Select name="type" value={type} onValueChange={(value) => setType((value ?? "面试") as ReminderType)}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="h-10 w-full text-base">
                 <SelectValue placeholder="选择类型" />
               </SelectTrigger>
               <SelectContent>
@@ -52,14 +52,14 @@ export function ReminderForm({ applications, track }: { applications: Applicatio
             </Select>
           </Field>
           <Field>
-            <FieldLabel htmlFor="remindAt">提醒时间</FieldLabel>
-            <Input id="remindAt" name="remindAt" type="datetime-local" required />
+            <FieldLabel htmlFor="remindAt" className="text-base">提醒时间</FieldLabel>
+            <Input id="remindAt" name="remindAt" type="datetime-local" step={1800} className="h-10 text-base" required />
           </Field>
         </div>
         <Field>
-          <FieldLabel>关联投递记录</FieldLabel>
+          <FieldLabel className="text-base">关联投递记录</FieldLabel>
           <Select name="applicationId" value={applicationId} onValueChange={(value) => setApplicationId(value ?? "none")}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="h-10 w-full text-base">
               <span className="flex flex-1 truncate text-left">
                 {selectedApplication
                   ? `${selectedApplication.companyName} / ${selectedApplication.position}`
@@ -77,7 +77,7 @@ export function ReminderForm({ applications, track }: { applications: Applicatio
               </SelectGroup>
             </SelectContent>
           </Select>
-          <FieldDescription>这里只会显示当前工作区的投递记录。</FieldDescription>
+          <FieldDescription className="text-sm">这里只会显示当前工作区的投递记录。</FieldDescription>
         </Field>
       </FieldGroup>
 
