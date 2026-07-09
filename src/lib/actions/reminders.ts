@@ -24,6 +24,11 @@ function revalidateReminderViews() {
   revalidatePath("/timeline");
 }
 
+function redirectToCalendar(track: string) {
+  const normalizedTrack = normalizeJobTrack(track);
+  redirect(normalizedTrack === "campus" ? "/calendar" : `/calendar?track=${normalizedTrack}`);
+}
+
 export async function createReminderAction(_state: ReminderActionState, formData: FormData): Promise<ReminderActionState> {
   const userId = await getCurrentUserId();
   const title = readRequired(formData, "title");
@@ -60,51 +65,55 @@ export async function createReminderAction(_state: ReminderActionState, formData
 
 export async function completeReminderAction(formData: FormData) {
   const id = readRequired(formData, "id");
+  const track = readRequired(formData, "track");
 
   if (!id) {
-    return;
+    redirectToCalendar(track);
   }
 
   const supabase = await createClient();
   await supabase.from("reminders").update({ is_done: true }).eq("id", id);
   revalidateReminderViews();
+  redirectToCalendar(track);
 }
 
 export async function deleteReminderAction(formData: FormData) {
   const id = readRequired(formData, "id");
+  const track = readRequired(formData, "track");
 
   if (!id) {
-    return;
+    redirectToCalendar(track);
   }
 
   const supabase = await createClient();
   await supabase.from("reminders").delete().eq("id", id);
   revalidateReminderViews();
+  redirectToCalendar(track);
 }
 export async function markReminderReadAction(formData: FormData) {
   const id = readRequired(formData, "id");
-  const track = normalizeJobTrack(readRequired(formData, "track"));
+  const track = readRequired(formData, "track");
 
   if (!id) {
-    redirect(track === "campus" ? "/calendar" : `/calendar?track=${track}`);
+    redirectToCalendar(track);
   }
 
   const supabase = await createClient();
   await supabase.from("reminders").update({ read_at: new Date().toISOString() }).eq("id", id);
   revalidateReminderViews();
-  redirect(track === "campus" ? "/calendar" : `/calendar?track=${track}`);
+  redirectToCalendar(track);
 }
 
 export async function markRemindersReadAction(formData: FormData) {
   const ids = formData.getAll("id").map((value) => String(value)).filter(Boolean);
-  const track = normalizeJobTrack(readRequired(formData, "track"));
+  const track = readRequired(formData, "track");
 
   if (ids.length === 0) {
-    redirect(track === "campus" ? "/calendar" : `/calendar?track=${track}`);
+    redirectToCalendar(track);
   }
 
   const supabase = await createClient();
   await supabase.from("reminders").update({ read_at: new Date().toISOString() }).in("id", ids);
   revalidateReminderViews();
-  redirect(track === "campus" ? "/calendar" : `/calendar?track=${track}`);
+  redirectToCalendar(track);
 }

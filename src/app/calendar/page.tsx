@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { getApplications, getUpcomingReminders } from "@/lib/data/applications";
+import { getApplications, getMonthReminders, getUpcomingReminders } from "@/lib/data/applications";
 import { formatDateTime, formatFullDate } from "@/lib/application-utils";
 import { JOB_TRACK_LABELS, normalizeJobTrack, withTrack } from "@/lib/job-track";
 
@@ -26,8 +26,12 @@ async function getPageTrack(searchParams?: PageProps["searchParams"]) {
 export default async function CalendarPage({ searchParams }: PageProps) {
   const track = await getPageTrack(searchParams);
   const label = JOB_TRACK_LABELS[track];
-  const [applications, reminders] = await Promise.all([getApplications(track), getUpcomingReminders(track)]);
-  const selectedDate = reminders[0] ? new Date(reminders[0].remindAt) : new Date();
+  const selectedDate = new Date();
+  const [applications, reminders, monthReminders] = await Promise.all([
+    getApplications(track),
+    getUpcomingReminders(track),
+    getMonthReminders(track, selectedDate),
+  ]);
 
   return (
     <AppShell track={track}>
@@ -40,7 +44,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
               <CardTitle>日历</CardTitle>
             </CardHeader>
             <CardContent>
-              <ReminderMonthCalendar reminders={reminders} selectedDate={selectedDate} />
+              <ReminderMonthCalendar reminders={monthReminders} selectedDate={selectedDate} />
             </CardContent>
           </Card>
 
@@ -91,12 +95,14 @@ export default async function CalendarPage({ searchParams }: PageProps) {
                         <p className="hidden text-sm text-muted-foreground md:block">{formatFullDate(reminder.remindAt)}</p>
                         <form action={completeReminderAction}>
                           <input type="hidden" name="id" value={reminder.id} />
+                          <input type="hidden" name="track" value={track} />
                           <Button type="submit" variant="outline" size="icon-sm" aria-label="标记完成">
                             <Check />
                           </Button>
                         </form>
                         <form action={deleteReminderAction}>
                           <input type="hidden" name="id" value={reminder.id} />
+                          <input type="hidden" name="track" value={track} />
                           <Button type="submit" variant="ghost" size="icon-sm" aria-label="删除提醒">
                             <Trash2 />
                           </Button>

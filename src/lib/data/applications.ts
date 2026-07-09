@@ -302,6 +302,65 @@ export async function getUpcomingReminders(track: JobTrack = DEFAULT_JOB_TRACK) 
 
   return (legacy.data ?? []).map(mapReminder);
 }
+
+export async function getMonthReminders(track: JobTrack = DEFAULT_JOB_TRACK, anchorDate: Date = new Date()) {
+  await getCurrentUserId();
+  const supabase = await createClient();
+  const start = new Date(anchorDate.getFullYear(), anchorDate.getMonth(), 1);
+  const end = new Date(anchorDate.getFullYear(), anchorDate.getMonth() + 1, 1);
+
+  const { data, error } = await supabase
+    .from("reminders")
+    .select(reminderSelect)
+    .eq("track", track)
+    .eq("is_done", false)
+    .gte("remind_at", start.toISOString())
+    .lt("remind_at", end.toISOString())
+    .order("remind_at", { ascending: true });
+
+  if (!error) {
+    return (data ?? []).map(mapReminder);
+  }
+
+  if (isMissingReadAtColumn(error)) {
+    const withoutReadState = await supabase
+      .from("reminders")
+      .select(trackedReminderWithoutReadSelect)
+      .eq("track", track)
+      .eq("is_done", false)
+      .gte("remind_at", start.toISOString())
+      .lt("remind_at", end.toISOString())
+      .order("remind_at", { ascending: true });
+
+    if (!withoutReadState.error) {
+      return (withoutReadState.data ?? []).map(mapReminder);
+    }
+
+    if (!isMissingTrackColumn(withoutReadState.error)) {
+      throw new Error(withoutReadState.error.message);
+    }
+  } else if (!isMissingTrackColumn(error)) {
+    throw new Error(error.message);
+  }
+
+  if (track !== DEFAULT_JOB_TRACK) {
+    return [];
+  }
+
+  const legacy = await supabase
+    .from("reminders")
+    .select(legacyReminderSelect)
+    .eq("is_done", false)
+    .gte("remind_at", start.toISOString())
+    .lt("remind_at", end.toISOString())
+    .order("remind_at", { ascending: true });
+
+  if (legacy.error) {
+    throw new Error(legacy.error.message);
+  }
+
+  return (legacy.data ?? []).map(mapReminder);
+}
 export async function getNotificationReminders(track: JobTrack = DEFAULT_JOB_TRACK) {
   await getCurrentUserId();
   const supabase = await createClient();
