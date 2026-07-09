@@ -20,8 +20,6 @@ function readRequired(formData: FormData, key: string) {
 function revalidateReminderViews() {
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
-  revalidatePath("/applications");
-  revalidatePath("/timeline");
 }
 
 function redirectToCalendar(track: string) {
@@ -128,6 +126,18 @@ export async function markReminderReadAction(formData: FormData) {
   redirectToCalendar(track);
 }
 
+export async function markReminderReadInlineAction(formData: FormData) {
+  const id = readRequired(formData, "id");
+
+  if (!id) {
+    return;
+  }
+
+  const supabase = await createClient();
+  await supabase.from("reminders").update({ read_at: new Date().toISOString() }).eq("id", id);
+  revalidateReminderViews();
+}
+
 export async function markRemindersReadAction(formData: FormData) {
   const ids = formData.getAll("id").map((value) => String(value)).filter(Boolean);
   const track = readRequired(formData, "track");
@@ -140,4 +150,16 @@ export async function markRemindersReadAction(formData: FormData) {
   await supabase.from("reminders").update({ read_at: new Date().toISOString() }).in("id", ids);
   revalidateReminderViews();
   redirectToCalendar(track);
+}
+
+export async function markRemindersReadInlineAction(formData: FormData) {
+  const ids = formData.getAll("id").map((value) => String(value)).filter(Boolean);
+
+  if (ids.length === 0) {
+    return;
+  }
+
+  const supabase = await createClient();
+  await supabase.from("reminders").update({ read_at: new Date().toISOString() }).in("id", ids);
+  revalidateReminderViews();
 }
