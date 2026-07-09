@@ -29,9 +29,23 @@ Run these SQL files in Supabase SQL Editor in order:
 ```txt
 supabase/migrations/0001_initial_schema.sql
 supabase/migrations/0002_fix_existing_profiles.sql
+supabase/migrations/0003_allow_custom_application_fields.sql
+supabase/migrations/0004_remove_favorite_status.sql
+supabase/migrations/0005_add_job_track.sql
+supabase/migrations/0006_add_reminder_read_at.sql
 ```
 
 `0002_fix_existing_profiles.sql` fixes users who registered before the `profiles` trigger existed.
+
+## Self-Hosting On One Server
+
+If you want to deploy the GoodJobs frontend and the database/Auth stack on the same server, read:
+
+```txt
+docs/self-hosting.md
+```
+
+GoodJobs uses Supabase Auth, RLS policies, and `auth.uid()`, so a plain PostgreSQL database is not enough unless the app is refactored away from Supabase Auth.
 
 ## Deployment To Vercel
 
