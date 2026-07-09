@@ -1,17 +1,14 @@
-﻿import Link from "next/link";
-import { CalendarCheck, Check, Clock, ListTodo, Trash2 } from "lucide-react";
-import { completeReminderAction, deleteReminderAction } from "@/lib/actions/reminders";
+import { ListTodo } from "lucide-react";
 import { ReminderForm } from "@/components/calendar/reminder-form";
 import { ReminderMonthCalendar } from "@/components/calendar/reminder-month-calendar";
+import { ReminderTaskList } from "@/components/calendar/reminder-task-list";
 import { PageHeading } from "@/components/layout/page-heading";
 import { AppShell } from "@/components/layout/app-shell";
-import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { getApplications, getMonthReminders, getUpcomingReminders } from "@/lib/data/applications";
-import { formatDateTime, formatFullDate } from "@/lib/application-utils";
-import { JOB_TRACK_LABELS, normalizeJobTrack, withTrack } from "@/lib/job-track";
+import { JOB_TRACK_LABELS, normalizeJobTrack } from "@/lib/job-track";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -66,52 +63,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
               </Dialog>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              {reminders.length > 0 ? reminders.map((reminder) => {
-                const application = applications.find((item) => item.id === reminder.applicationId);
-                return (
-                  <div key={reminder.id} className="rounded-lg border p-4">
-                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                      <div className="flex gap-3">
-                        <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                          <CalendarCheck data-icon="inline-start" />
-                        </span>
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <p className="font-medium">{reminder.title}</p>
-                            <Badge variant="secondary">{reminder.type}</Badge>
-                          </div>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            <Clock data-icon="inline-start" />
-                            {formatDateTime(reminder.remindAt)}
-                          </p>
-                          {application ? (
-                            <Link href={withTrack(`/applications/${application.id}`, track)} prefetch className={buttonVariants({ variant: "link", className: "mt-2 h-auto p-0" })}>
-                              {application.companyName} / {application.position}
-                            </Link>
-                          ) : null}
-                        </div>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        <p className="hidden text-sm text-muted-foreground md:block">{formatFullDate(reminder.remindAt)}</p>
-                        <form action={completeReminderAction}>
-                          <input type="hidden" name="id" value={reminder.id} />
-                          <input type="hidden" name="track" value={track} />
-                          <Button type="submit" variant="outline" size="icon-sm" aria-label="标记完成">
-                            <Check />
-                          </Button>
-                        </form>
-                        <form action={deleteReminderAction}>
-                          <input type="hidden" name="id" value={reminder.id} />
-                          <input type="hidden" name="track" value={track} />
-                          <Button type="submit" variant="ghost" size="icon-sm" aria-label="删除提醒">
-                            <Trash2 />
-                          </Button>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                );
-              }) : <p className="text-sm text-muted-foreground">暂无提醒。点击“新增提醒”记录测评、笔试、面试或投递截止日期。</p>}
+              <ReminderTaskList reminders={reminders} applications={applications} track={track} />
             </CardContent>
           </Card>
         </section>

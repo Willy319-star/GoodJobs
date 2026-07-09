@@ -77,6 +77,18 @@ export async function completeReminderAction(formData: FormData) {
   redirectToCalendar(track);
 }
 
+export async function completeReminderInlineAction(formData: FormData) {
+  const id = readRequired(formData, "id");
+
+  if (!id) {
+    return;
+  }
+
+  const supabase = await createClient();
+  await supabase.from("reminders").update({ is_done: true }).eq("id", id);
+  revalidateReminderViews();
+}
+
 export async function deleteReminderAction(formData: FormData) {
   const id = readRequired(formData, "id");
   const track = readRequired(formData, "track");
@@ -89,6 +101,18 @@ export async function deleteReminderAction(formData: FormData) {
   await supabase.from("reminders").delete().eq("id", id);
   revalidateReminderViews();
   redirectToCalendar(track);
+}
+
+export async function deleteReminderInlineAction(formData: FormData) {
+  const id = readRequired(formData, "id");
+
+  if (!id) {
+    return;
+  }
+
+  const supabase = await createClient();
+  await supabase.from("reminders").delete().eq("id", id);
+  revalidateReminderViews();
 }
 export async function markReminderReadAction(formData: FormData) {
   const id = readRequired(formData, "id");
