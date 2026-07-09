@@ -31,10 +31,11 @@ export function NotificationBell({ reminders, track }: { reminders: Reminder[]; 
           <div className="flex items-center gap-2">
             {count > 0 ? (
               <form action={markRemindersReadAction}>
+                <input type="hidden" name="track" value={track} />
                 {reminders.map((reminder) => (
                   <input key={reminder.id} type="hidden" name="id" value={reminder.id} />
                 ))}
-                <button type="submit" className="text-xs text-blue-600 hover:text-blue-700">
+                <button type="submit" className="relative z-10 cursor-pointer text-xs text-blue-600 hover:text-blue-700">
                   标为已读
                 </button>
               </form>

@@ -97,12 +97,14 @@ export async function markReminderReadAction(formData: FormData) {
 
 export async function markRemindersReadAction(formData: FormData) {
   const ids = formData.getAll("id").map((value) => String(value)).filter(Boolean);
+  const track = normalizeJobTrack(readRequired(formData, "track"));
 
   if (ids.length === 0) {
-    return;
+    redirect(track === "campus" ? "/calendar" : `/calendar?track=${track}`);
   }
 
   const supabase = await createClient();
   await supabase.from("reminders").update({ read_at: new Date().toISOString() }).in("id", ids);
   revalidateReminderViews();
+  redirect(track === "campus" ? "/calendar" : `/calendar?track=${track}`);
 }
