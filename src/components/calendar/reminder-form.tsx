@@ -17,27 +17,34 @@ const initialState: ReminderActionState = {
 
 const reminderTypes = ["测评", "笔试", "面试", "复盘", "截止日期", "其他"] as const;
 type ReminderType = (typeof reminderTypes)[number];
+const reminderHours = Array.from({ length: 24 }, (_, hour) => String(hour).padStart(2, "0"));
+const reminderMinutes = ["00", "30"] as const;
 
 export function ReminderForm({ applications, track }: { applications: Application[]; track: JobTrack }) {
   const [state, formAction, isPending] = useActionState(createReminderAction, initialState);
   const [type, setType] = useState<ReminderType>("面试");
   const [applicationId, setApplicationId] = useState("none");
+  const [remindDate, setRemindDate] = useState("");
+  const [remindHour, setRemindHour] = useState("09");
+  const [remindMinute, setRemindMinute] = useState<(typeof reminderMinutes)[number]>("00");
   const selectedApplication = applications.find((application) => application.id === applicationId);
+  const remindAt = remindDate ? `${remindDate}T${remindHour}:${remindMinute}` : "";
 
   return (
-    <form action={formAction} className="flex flex-col gap-6 text-base">
+    <form action={formAction} className="flex flex-col gap-6 text-lg">
       <input type="hidden" name="track" value={track} />
+      <input type="hidden" name="remindAt" value={remindAt} />
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="title" className="text-base">提醒内容</FieldLabel>
-          <Input id="title" name="title" className="h-10 text-base" placeholder="例如：腾讯一面 / 字节笔试 / 简历投递截止" required />
+          <FieldLabel htmlFor="title" className="text-lg">提醒内容</FieldLabel>
+          <Input id="title" name="title" className="h-11 text-lg" placeholder="例如：腾讯一面 / 字节笔试 / 简历投递截止" required />
           <FieldDescription className="text-sm">写一句你未来要处理的事情。</FieldDescription>
         </Field>
         <div className="grid gap-4 md:grid-cols-2">
           <Field>
-            <FieldLabel className="text-base">提醒类型</FieldLabel>
+            <FieldLabel className="text-lg">提醒类型</FieldLabel>
             <Select name="type" value={type} onValueChange={(value) => setType((value ?? "面试") as ReminderType)}>
-              <SelectTrigger className="h-10 w-full text-base">
+              <SelectTrigger className="h-11 w-full text-lg">
                 <SelectValue placeholder="选择类型" />
               </SelectTrigger>
               <SelectContent>
@@ -52,14 +59,51 @@ export function ReminderForm({ applications, track }: { applications: Applicatio
             </Select>
           </Field>
           <Field>
-            <FieldLabel htmlFor="remindAt" className="text-base">提醒时间</FieldLabel>
-            <Input id="remindAt" name="remindAt" type="datetime-local" step={1800} className="h-10 text-base" required />
+            <FieldLabel htmlFor="remindDate" className="text-lg">提醒时间</FieldLabel>
+            <div className="grid grid-cols-[1fr_88px_88px] gap-2">
+              <Input
+                id="remindDate"
+                type="date"
+                value={remindDate}
+                onChange={(event) => setRemindDate(event.target.value)}
+                className="h-11 text-lg"
+                required
+              />
+              <Select value={remindHour} onValueChange={(value) => setRemindHour(value ?? "09")}>
+                <SelectTrigger className="h-11 w-full text-lg">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {reminderHours.map((hour) => (
+                      <SelectItem key={hour} value={hour}>
+                        {hour}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <Select value={remindMinute} onValueChange={(value) => setRemindMinute((value ?? "00") as (typeof reminderMinutes)[number])}>
+                <SelectTrigger className="h-11 w-full text-lg">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {reminderMinutes.map((minute) => (
+                      <SelectItem key={minute} value={minute}>
+                        {minute}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
           </Field>
         </div>
         <Field>
-          <FieldLabel className="text-base">关联投递记录</FieldLabel>
+          <FieldLabel className="text-lg">关联投递记录</FieldLabel>
           <Select name="applicationId" value={applicationId} onValueChange={(value) => setApplicationId(value ?? "none")}>
-            <SelectTrigger className="h-10 w-full text-base">
+            <SelectTrigger className="h-11 w-full text-lg">
               <span className="flex flex-1 truncate text-left">
                 {selectedApplication
                   ? `${selectedApplication.companyName} / ${selectedApplication.position}`
