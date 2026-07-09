@@ -22,6 +22,7 @@ export function ReminderForm({ applications, track }: { applications: Applicatio
   const [state, formAction, isPending] = useActionState(createReminderAction, initialState);
   const [type, setType] = useState<ReminderType>("面试");
   const [applicationId, setApplicationId] = useState("none");
+  const selectedApplication = applications.find((application) => application.id === applicationId);
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
@@ -59,7 +60,11 @@ export function ReminderForm({ applications, track }: { applications: Applicatio
           <FieldLabel>关联投递记录</FieldLabel>
           <Select name="applicationId" value={applicationId} onValueChange={(value) => setApplicationId(value ?? "none")}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="可选" />
+              <span className="flex flex-1 truncate text-left">
+                {selectedApplication
+                  ? `${selectedApplication.companyName} / ${selectedApplication.position}`
+                  : "不关联投递记录"}
+              </span>
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
