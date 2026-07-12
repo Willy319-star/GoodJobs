@@ -77,7 +77,7 @@ export default async function TimelinePage({ searchParams }: PageProps) {
         ) : (
           <Card>
             <CardContent className="p-8 text-center text-sm text-muted-foreground">
-              \u6682\u65e0\u65f6\u95f4\u7ebf\u4e8b\u4ef6\u3002\u65b0\u589e\u6295\u9012\u540e\uff0c\u8fd9\u91cc\u4f1a\u81ea\u52a8\u51fa\u73b0\u5b8c\u6574\u6d41\u7a0b\u3002
+              暂无时间线事件。新增投递后，这里会自动出现完整流程。
             </CardContent>
           </Card>
         )}
