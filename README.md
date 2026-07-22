@@ -33,9 +33,14 @@ supabase/migrations/0003_allow_custom_application_fields.sql
 supabase/migrations/0004_remove_favorite_status.sql
 supabase/migrations/0005_add_job_track.sql
 supabase/migrations/0006_add_reminder_read_at.sql
+supabase/migrations/0007_invite_codes.sql
 ```
 
 `0002_fix_existing_profiles.sql` fixes users who registered before the `profiles` trigger existed.
+
+GoodJobs sign-up is protected by one-time invite codes. The public migration only creates the
+invite-code table and RPC functions. Actual code inserts should stay private. For the initial
+beta batch, run the local ignored file `private/invite-codes-20260722.sql` in Supabase SQL Editor.
 
 ## Self-Hosting On One Server
 

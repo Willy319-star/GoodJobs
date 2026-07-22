@@ -27,7 +27,9 @@ export function AuthForm() {
         <div>
           <CardTitle className="text-2xl">{mode === "sign-in" ? "登录 GoodJobs" : "注册 GoodJobs"}</CardTitle>
           <p className="mt-2 text-sm text-muted-foreground">
-            {mode === "sign-in" ? "继续管理你的秋招进度、面试和提醒。" : "创建账号后，你的数据会通过 Supabase RLS 隔离保护。"}
+            {mode === "sign-in"
+              ? "继续管理你的秋招、实习进度和重要提醒。"
+              : "输入邀请码创建账号，你的数据会通过 Supabase RLS 隔离保护。"}
           </p>
         </div>
       </CardHeader>
@@ -51,6 +53,20 @@ export function AuthForm() {
               />
               <FieldDescription>请使用你能长期访问的邮箱。</FieldDescription>
             </Field>
+            {mode === "sign-up" ? (
+              <Field>
+                <FieldLabel htmlFor="inviteCode">邀请码</FieldLabel>
+                <Input
+                  id="inviteCode"
+                  name="inviteCode"
+                  placeholder="GJ-ABCD-1234"
+                  autoComplete="off"
+                  className="uppercase"
+                  required
+                />
+                <FieldDescription>邀请码由 GoodJobs 管理员发放，每个邀请码只能使用一次。</FieldDescription>
+              </Field>
+            ) : null}
           </FieldGroup>
 
           {state.message ? (

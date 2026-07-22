@@ -194,9 +194,40 @@ export type Database = {
         };
         Relationships: [];
       };
+      invite_codes: {
+        Row: {
+          code: string;
+          used_by: string | null;
+          used_at: string | null;
+          created_at: string;
+          note: string | null;
+        };
+        Insert: {
+          code: string;
+          used_by?: string | null;
+          used_at?: string | null;
+          created_at?: string;
+          note?: string | null;
+        };
+        Update: {
+          used_by?: string | null;
+          used_at?: string | null;
+          note?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      is_invite_code_available: {
+        Args: { invite_code: string };
+        Returns: boolean;
+      };
+      claim_invite_code: {
+        Args: { invite_code: string; claim_user_id: string };
+        Returns: boolean;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
